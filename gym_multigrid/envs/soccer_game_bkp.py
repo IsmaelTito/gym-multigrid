@@ -14,20 +14,16 @@ class SoccerGameEnv(MultiGridEnv):
         goal_pst = [],
         goal_index = [],
         num_balls=[],
-        balls_pst = [],
-        balls_index=[],
         agents_index = [],
+        balls_index=[],
         zero_sum = False,
-        reward_value=1,
+
     ):
-        
+        self.num_balls = num_balls
         self.goal_pst = goal_pst
         self.goal_index = goal_index
-        self.num_balls = num_balls
-        self.balls_pst = balls_pst
         self.balls_index = balls_index
         self.zero_sum = zero_sum
-        self.reward_value = reward_value
 
         self.world = World
 
@@ -39,7 +35,7 @@ class SoccerGameEnv(MultiGridEnv):
             grid_size=size,
             width=width,
             height=height,
-            max_steps= 50,
+            max_steps= 10000,
             # Set this to True for maximum speed
             see_through_walls=False,
             agents=agents,
@@ -55,30 +51,24 @@ class SoccerGameEnv(MultiGridEnv):
         self.grid.vert_wall(self.world, 0, 0)
         self.grid.vert_wall(self.world, width-1, 0)
 
-        # place goal/nest
         for i in range(len(self.goal_pst)):
-            self.place_obj(ObjectGoal(world=self.world,index=self.goal_index[i],target_type='ball',reward=self.reward_value), 
-                top=self.goal_pst[i], size=[1,1])
+            self.place_obj(ObjectGoal(self.world,self.goal_index[i], 'ball'), top=self.goal_pst[i], size=[1,1])
 
-        # place balls
         for number, index in zip(self.num_balls, self.balls_index):
             for i in range(number):
-                self.place_obj(Ball(self.world,index), top=self.balls_pst[i], size=[1,1])
+                self.place_obj(Ball(self.world,index))
 
         # Randomize the player start position and orientation
         for a in self.agents:
             self.place_agent(a)
 
-    def _reward(self, i, rewards, reward=1):
+    def _reward(self, i, rewards,reward=1):
         for j,a in enumerate(self.agents):
-            #if a.index==i or a.index==0:
-            if j == i:
-                rewards[i]+=reward
-                #print("I got reward cause I am of the same index", a.index)
-                print("I am agent {} and got this reward: {}".format(i, rewards[i]))
-            '''if self.zero_sum:
+            if a.index==i or a.index==0:
+                rewards[j]+=reward
+            if self.zero_sum:
                 if a.index!=i or a.index==0:
-                    rewards[j] -= reward'''
+                    rewards[j] -= reward
 
     def _handle_pickup(self, i, rewards, fwd_pos, fwd_cell):
         if fwd_cell:
@@ -96,16 +86,11 @@ class SoccerGameEnv(MultiGridEnv):
     def _handle_drop(self, i, rewards, fwd_pos, fwd_cell):
         if self.agents[i].carrying:
             if fwd_cell:
-                #if fwd_cell.type == 'objgoal' and fwd_cell.target_type == self.agents[i].carrying.type:
-                if fwd_cell.type == 'objgoal':
+                if fwd_cell.type == 'objgoal' and fwd_cell.target_type == self.agents[i].carrying.type:
                     if self.agents[i].carrying.index in [0, fwd_cell.index]:
-                        print("I am carrying agent {} and got this reward: {}".format(i, fwd_cell.reward))
-                        #rewards[i]+=fwd_cell.reward
-                        #self._reward(fwd_cell.index, rewards, fwd_cell.reward)
-                        self._reward(i, rewards, fwd_cell.reward)
+                        self._reward(fwd_cell.index, rewards, fwd_cell.reward)
                         self.agents[i].carrying = None
-
-                elif fwd_cell.type=='agent': #pasar la bola
+                elif fwd_cell.type=='agent':
                     if fwd_cell.carrying is None:
                         fwd_cell.carrying = self.agents[i].carrying
                         self.agents[i].carrying = None
@@ -123,14 +108,11 @@ class SoccerGameEnv(MultiGridEnv):
 class SoccerGame4HEnv10x15N2(SoccerGameEnv):
     def __init__(self):
         super().__init__(size=None,
-        height=11,
+        height=10,
         width=15,
-        goal_pst = [[1,5]], # x,y coordinates of the goal -- topleft corner is the 0,0
-        goal_index = [1], # GOAL COLOR - particular number refer to team color - 0:red, 1:green, 2:blue
-        num_balls=[4],
-        balls_pst = [[5,6], [1,6], [2,6], [5,5]], # x,y coordinates of the goal -- topleft corner is the 0,0
-        balls_index=[0], #changes ball color - 0:red, 1:green, 2:blue
-        agents_index = [1,1,1,1], #NUMBER OF AGENTS - particular number refer to team color - 0:red, 1:green, 2:blue
-        zero_sum=True,
-        reward_value=2)
-
+        goal_pst = [[1,5], [13,5]],
+        goal_index = [1,2],
+        num_balls=[1],
+        agents_index = [1,1,2,2],
+        balls_index=[0],
+        zero_sum=True)

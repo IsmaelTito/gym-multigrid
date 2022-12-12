@@ -30,6 +30,8 @@ def main():
 
     while True:
         env.render(mode='human', highlight=True)
+        # highlight - visualizes the range of vision of the agents
+
         time.sleep(0.1)
 
         ac = [env.action_space.sample() for _ in range(nb_agents)]
