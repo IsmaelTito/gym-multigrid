@@ -75,7 +75,7 @@ class SoccerGameEnv(MultiGridEnv):
             if j == i:
                 rewards[i]+=reward
                 #print("I got reward cause I am of the same index", a.index)
-                print("I am agent {} and got this reward: {}".format(i, rewards[i]))
+                #print("I am agent {} and got this reward: {}".format(i, rewards[i]))
             '''if self.zero_sum:
                 if a.index!=i or a.index==0:
                     rewards[j] -= reward'''
@@ -99,7 +99,7 @@ class SoccerGameEnv(MultiGridEnv):
                 #if fwd_cell.type == 'objgoal' and fwd_cell.target_type == self.agents[i].carrying.type:
                 if fwd_cell.type == 'objgoal':
                     if self.agents[i].carrying.index in [0, fwd_cell.index]:
-                        print("I am carrying agent {} and got this reward: {}".format(i, fwd_cell.reward))
+                        #print("I am carrying agent {} and got this reward: {}".format(i, fwd_cell.reward))
                         #rewards[i]+=fwd_cell.reward
                         #self._reward(fwd_cell.index, rewards, fwd_cell.reward)
                         self._reward(i, rewards, fwd_cell.reward)
@@ -130,7 +130,7 @@ class SoccerGame4HEnv10x15N2(SoccerGameEnv):
         num_balls=[4],
         balls_pst = [[5,6], [1,6], [2,6], [5,5]], # x,y coordinates of the goal -- topleft corner is the 0,0
         balls_index=[0], #changes ball color - 0:red, 1:green, 2:blue
-        agents_index = [1,1,1,1], #NUMBER OF AGENTS - particular number refer to team color - 0:red, 1:green, 2:blue
+        agents_index = [1,2,3,4], #NUMBER OF AGENTS - particular number refer to team color - 0:red, 1:green, 2:blue
         zero_sum=True,
         reward_value=2)
 
